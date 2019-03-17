@@ -1,0 +1,47 @@
+version: '3'
+services:
+  mongo:
+    restart: always
+    image: 'mongo:4.0.6-xenial'
+    environment:
+      # provide your credentials here
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=rootPassXXX
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo localhost:27017/strapi --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    command: mongod --smallfiles
+  nginx:
+    restart: always
+    build:
+      dockerfile: dev.Dockerfile
+      context: ./nginx
+    ports:
+      - '3000:80'
+  strapi:
+    depends_on: 
+      - mongo
+    build:
+      dockerfile: dev.Dockerfile
+      context: ./server
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    environment:
+      - DATABASE_HOST=mongo
+      - DATABASE_PORT=27017
+      - DATABASE_NAME=strapi
+      - DATABASE_USERNAME=root
+      - DATABASE_PASSWORD=rootPassXX
+    command: ["sh", "./wait-for-mongo.sh", "npm", "run", "start"]
+  client:
+    build:
+      dockerfile: dev.Dockerfile
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
