@@ -7,21 +7,20 @@ services:
       - POSTGRES_USER=jun-admin
       - POSTGRES_PASSWORD=DevAdmin
   nginx:
-    restart: always
+    restart: unless-stopped
     build:
       dockerfile: dev.Dockerfile
       context: ./nginx
     ports:
       - '3050:80'
-  server:
+      - '1337:1337'
+  backend:
     build:
       dockerfile: dev.Dockerfile
       context: ./server
     volumes:
       - /app/node_modules
       - ./server:/app
-    ports:
-      - '1337:1337'
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
