@@ -24,6 +24,7 @@ services:
       - '1337:1337'
     environment:
       - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
       - POSTGRES_DB=blog-project
       - POSTGRES_USER=jun-admin
       - POSTGRES_PASSWORD=DevAdmin

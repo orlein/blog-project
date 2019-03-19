@@ -5,11 +5,11 @@
       "connector": "strapi-hook-bookshelf",
       "settings": {
         "client": "postgres",
-        "host": "127.0.0.1",
-        "port": 5432,
-        "database": "blog-project",
-        "username": "jun-admin",
-        "password": "DevAdmin"
+        "host": "${process.env.POSTGRES_HOST || '127.0.0.1'}",
+        "port": "${process.env.POSTGRES_PORT || 5432}",
+        "database": "${process.env.PROCESS_DB || 'blog-project'}",
+        "username": "${process.env.USER || 'jun-admin'}",
+        "password": "${process.env.PASSWORD || 'DevAdmin'}"
       },
       "options": {}
     }
