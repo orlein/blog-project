@@ -1,0 +1,66 @@
+{
+  "connection": "default",
+  "collectionName": "articles",
+  "info": {
+    "name": "article",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "comment": ""
+  },
+  "attributes": {
+    "title": {
+      "default": "",
+      "type": "string"
+    },
+    "isVisible": {
+      "default": true,
+      "type": "boolean",
+      "required": true
+    },
+    "writer": {
+      "model": "user",
+      "via": "articlesWrite",
+      "plugin": "users-permissions"
+    },
+    "images": {
+      "collection": "file",
+      "via": "related",
+      "plugin": "upload",
+      "required": false
+    },
+    "content": {
+      "default": "",
+      "maxLength": 500,
+      "minLength": 10,
+      "type": "text"
+    },
+    "password": {
+      "default": "",
+      "maxLength": 25,
+      "minLength": 4,
+      "type": "password",
+      "required": true
+    },
+    "userLiked": {
+      "collection": "user",
+      "via": "articleLiked",
+      "plugin": "users-permissions"
+    },
+    "userDisliked": {
+      "collection": "user",
+      "via": "articleDisliked",
+      "plugin": "users-permissions"
+    },
+    "jsonContent": {
+      "default": "",
+      "type": "json"
+    },
+    "category": {
+      "model": "category",
+      "via": "articles"
+    }
+  }
+}

@@ -48,6 +48,30 @@
       "via": "users",
       "plugin": "users-permissions",
       "configurable": false
+    },
+    "articlesWrite": {
+      "collection": "article",
+      "via": "writer"
+    },
+    "articleLiked": {
+      "model": "article",
+      "via": "userLiked"
+    },
+    "articleDisliked": {
+      "model": "article",
+      "via": "userDisliked"
+    },
+    "commentWrite": {
+      "model": "comment",
+      "via": "writer"
+    },
+    "commentLike": {
+      "model": "comment",
+      "via": "usersLike"
+    },
+    "commentDislike": {
+      "model": "comment",
+      "via": "usersDislike"
     }
   },
   "collectionName": "users-permissions_user"
