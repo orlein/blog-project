@@ -1,37 +1,32 @@
 version: '3'
 services:
-  mongo:
-    restart: always
-    image: 'mongo:4.0.6-xenial'
+  postgres:
+    image: 'postgres:alpine'
     environment:
-      # provide your credentials here
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=rootPassXXX
-    ports:
-      - "27017:27017"
+      - POSTGRES_DB=blog-project
+      - POSTGRES_USER=jun-admin
+      - POSTGRES_PASSWORD=DevAdmin
   nginx:
     restart: always
     build:
       dockerfile: dev.Dockerfile
       context: ./nginx
     ports:
-      - '3000:80'
-  strapi:
-    depends_on: 
-      - mongo
+      - '3050:80'
+  server:
     build:
       dockerfile: dev.Dockerfile
       context: ./server
     volumes:
       - /app/node_modules
       - ./server:/app
+    ports:
+      - '1337:1337'
     environment:
-      - DATABASE_HOST=mongo
-      - DATABASE_PORT=27017
-      - DATABASE_NAME=strapi
-      - DATABASE_USERNAME=root
-      - DATABASE_PASSWORD=rootPassXX
-    command: ["sh", "./wait-for-mongo.sh", "npm", "run", "start"]
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=blog-project
+      - POSTGRES_USER=jun-admin
+      - POSTGRES_PASSWORD=DevAdmin
   client:
     build:
       dockerfile: dev.Dockerfile
