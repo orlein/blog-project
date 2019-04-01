@@ -11,9 +11,9 @@
     {
       "name": "server",
       "image": "pcj9024/blog-server",
-      "hostname": "api",
+      "hostname": "backend",
       "essential": false,
-      "memory": 128
+      "memory": 256
     },
     {
       "name": "nginx",
@@ -27,7 +27,7 @@
         }
       ],
       "links": ["client", "server"],
-      "memory": 128
+      "memory": 256
     }
   ]
 }
