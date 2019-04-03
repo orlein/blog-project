@@ -1,0 +1,1 @@
+export const cookieSecret: string = String(process.env.cookieSecret) || 'nodebirdsecret';

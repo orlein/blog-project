@@ -1,13 +1,16 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import bodyParser = require('body-parser');
-
+import routes from './api';
+import { cookieSecret } from './config';
 
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
 
+app.use(cors());
+app.use(express.json());
+app.use(cookieParser(cookieSecret));
+
+app.use(routes);
 
 app.get('*', (req: Request, res: Response) =>{
   res.send('hi');
