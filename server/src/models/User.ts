@@ -1,7 +1,11 @@
-import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, AutoIncrement, Unique, ForeignKey, BelongsToMany } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, AutoIncrement, Unique, ForeignKey, BelongsToMany, DefaultScope } from 'sequelize-typescript';
 import { Article } from './Article';
 import { Channel } from './Channel';
 import { UsersLikeArticles, UsersDislikeArticles } from './UserArticle';
+import sequelize from 'sequelize';
+@DefaultScope({
+  attributes: ['id', 'nickname', 'email', 'createdAt']
+})
 @Table
 export class User extends Model<User> {
   @PrimaryKey
@@ -40,10 +44,10 @@ export class User extends Model<User> {
   articlesWritten?: Article[]
 
   @BelongsToMany(() => Article, () => UsersLikeArticles)
-  likes?: Article[];
+  likeArticles?: Article[];
 
   @BelongsToMany(() => Article, () => UsersDislikeArticles )
-  dislikes?: Article[];
+  dislikeArticles?: Article[];
 
   @HasMany(() => Channel)
   folloingChannels?: Channel[];
