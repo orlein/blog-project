@@ -1,7 +1,6 @@
 import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { User } from './User';
-import { Comment } from './Comment';
-import { Channel } from './Channel';
+import { Comment, Channel } from '.';
 
 @Table
 export class Article extends Model<Article> {
@@ -23,10 +22,20 @@ export class Article extends Model<Article> {
   @BelongsTo(() => User)
   writer!: User;
 
+  @BelongsTo(() => User, 'likedUserId')
+  likedUsers?: User[];
+
   @HasMany(() => Comment)
   comments?: Comment[];
 
   @BelongsTo(() => Channel)
   channel!: Channel;
 
+  @CreatedAt
+  @Column
+  createdAt!: Date;
+
+  @UpdatedAt
+  @Column
+  updatedAt!: Date;
 }  

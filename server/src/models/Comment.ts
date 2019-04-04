@@ -1,6 +1,5 @@
-import { Table, Model, PrimaryKey, Column, AutoIncrement, Unique, AllowNull, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
-import { User } from "./User";
-import { Article } from "./Article";
+import { Table, Model, PrimaryKey, Column, AutoIncrement, Unique, AllowNull, BelongsToMany, ForeignKey, BelongsTo, CreatedAt, UpdatedAt } from 'sequelize-typescript';
+import { User, Article, UsersLikeComments, UsersDislikeComments } from '.';
 
 
 @Table
@@ -23,6 +22,12 @@ export class Comment extends Model<Comment> {
   @Column
   commentWriterId!: number;
 
+  @BelongsToMany(() => User, () => UsersLikeComments)
+  likes?: Article[];
+
+  @BelongsToMany(() => User, () => UsersDislikeComments )
+  dislikes?: Article[];
+
   @BelongsToMany(()=>Comment, ()=>CommentReply, 'commentId', 'replyId')
   replies?: Comment[];
 
@@ -32,8 +37,14 @@ export class Comment extends Model<Comment> {
 
   @BelongsTo(() => Article)
   article!: Article;
-  
-  
+
+  @CreatedAt
+  @Column
+  createdAt!: Date;
+
+  @UpdatedAt
+  @Column
+  updatedAt!: Date;
 }
 
 @Table

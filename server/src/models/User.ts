@@ -1,6 +1,7 @@
 import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, AutoIncrement, Unique, ForeignKey, BelongsToMany } from 'sequelize-typescript';
 import { Article } from './Article';
 import { Channel } from './Channel';
+import { UsersLikeArticles, UsersDislikeArticles } from './UserArticle';
 @Table
 export class User extends Model<User> {
   @PrimaryKey
@@ -20,10 +21,29 @@ export class User extends Model<User> {
   password?: string;
 
   @Column
-  facebookId!: string;
+  @AllowNull(true)
+  facebookAccessToken?: string;
+
+  @Column
+  @AllowNull(true)
+  facebookRefreshToken?: string;
+
+  @Column
+  @AllowNull(true)
+  googleAccessToken?: string;
+
+  @Column
+  @AllowNull(true)
+  googleRefreshToken?: string;
 
   @HasMany(()=>Article)
-  articlesWritten?: Article[];
+  articlesWritten?: Article[]
+
+  @BelongsToMany(() => Article, () => UsersLikeArticles)
+  likes?: Article[];
+
+  @BelongsToMany(() => Article, () => UsersDislikeArticles )
+  dislikes?: Article[];
 
   @HasMany(() => Channel)
   folloingChannels?: Channel[];
