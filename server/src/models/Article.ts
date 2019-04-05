@@ -1,4 +1,4 @@
-import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, ForeignKey, Unique, AutoIncrement, BelongsToMany } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, ForeignKey, Unique, AutoIncrement, BelongsToMany, Default } from 'sequelize-typescript';
 import { User } from './User';
 import { Channel } from './Channel';
 import { Comment } from './Comment';
@@ -19,6 +19,10 @@ export class Article extends Model<Article> {
   @Column
   content!: string;
 
+  @Default(true)
+  @Column
+  isCommentVisible!: boolean;
+
   @ForeignKey(() => User)
   @Column
   writerId!: number;
@@ -34,6 +38,10 @@ export class Article extends Model<Article> {
 
   @HasMany(() => Comment)
   comments?: Comment[];
+
+  @ForeignKey(() => Channel)
+  @Column
+  channelId!: number;
 
   @BelongsTo(() => Channel, 'articleChannelId')
   channel!: Channel;

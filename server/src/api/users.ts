@@ -19,6 +19,11 @@ export abstract class UsersController {
    * GET /api/v1/users/{id}
    *  */  
   public static getSingleUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
+    try {
+
+    } catch (e) {
+      next(e);
+    }
     return res.status(200).send('single user');
   }
 
