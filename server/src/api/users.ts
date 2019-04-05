@@ -1,11 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
+import { User } from '../models/User';
 
 export abstract class UsersController {
   /** 
    * GET /api/v1/users?page={page}&perPage={perPage}
    * */ 
   public static getUsers = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('return all users');
+    try {
+      const user = await User.findAll();
+      return res.status(200).json(user);
+    } catch(e) {
+      next(e);
+    }
+    // return res.status(200).send('return all users');
   }
 
   /**
@@ -19,7 +26,13 @@ export abstract class UsersController {
    * POST /api/v1/users
    */
   public static registerSingleUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('register user');
+    try {
+      const user = await User.create(req.body);
+      return res.status(200).json(user);
+    } catch (e) {
+      next(e);
+    }
+    // return res.status(200).send('register user');
   }
 
   /**

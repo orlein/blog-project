@@ -1,11 +1,15 @@
-import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, ForeignKey } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, ForeignKey, Unique, AutoIncrement, BelongsToMany } from 'sequelize-typescript';
 import { User } from './User';
-import { Comment, Channel } from '.';
-
+import { Channel } from './Channel';
+import { Comment } from './Comment';
+import { UsersLikeArticles } from './UsersLikeArticles';
+import { UsersDislikeArticles } from './UsersDislikeArticles';
 @Table
 export class Article extends Model<Article> {
 
   @PrimaryKey
+  @AutoIncrement
+  @Unique
   @Column
   id!: number;
 
@@ -19,16 +23,19 @@ export class Article extends Model<Article> {
   @Column
   writerId!: number;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, 'articleWriterId')
   writer!: User;
 
-  @BelongsTo(() => User, 'likedUserId')
+  @BelongsToMany(() => User, () => UsersLikeArticles, 'userId', 'articleId')
   likedUsers?: User[];
+
+  @BelongsToMany(() => User, () => UsersDislikeArticles, 'userId', 'articleId')
+  dislikedUsers?: User[];
 
   @HasMany(() => Comment)
   comments?: Comment[];
 
-  @BelongsTo(() => Channel)
+  @BelongsTo(() => Channel, 'articleChannelId')
   channel!: Channel;
 
   @CreatedAt

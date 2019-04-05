@@ -1,17 +1,31 @@
 import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, AutoIncrement, Unique, ForeignKey, BelongsToMany, DefaultScope } from 'sequelize-typescript';
 import { Article } from './Article';
 import { Channel } from './Channel';
-import { UsersLikeArticles, UsersDislikeArticles } from './UserArticle';
 import sequelize from 'sequelize';
+import { UsersLikeArticles } from './UsersLikeArticles';
+import { UsersDislikeArticles } from './UsersDislikeArticles';
+import { FollowingUser } from './FollowingUser';
+import { BlockingUser } from './BlockingUser';
+import { UsersFollowChannels } from './UsersFollowChannels';
 @DefaultScope({
   attributes: ['id', 'nickname', 'email', 'createdAt']
+})
+@Scopes({
+  followerCount: {
+    attributes: [[sequelize.fn('COUNT', sequelize.col('*')), 'followers']],
+    include: [{
+      model: () => User,
+      as: "followers"
+    }],
+    group: 'id'
+  }
 })
 @Table
 export class User extends Model<User> {
   @PrimaryKey
-  @Column
   @AutoIncrement
   @Unique
+  @Column
   id!: number;
 
   @Column
@@ -20,36 +34,36 @@ export class User extends Model<User> {
   @Column
   email?: string;
 
-  @Column
   @AllowNull(true)
+  @Column
   password?: string;
 
-  @Column
   @AllowNull(true)
+  @Column
   facebookAccessToken?: string;
 
-  @Column
   @AllowNull(true)
+  @Column
   facebookRefreshToken?: string;
 
-  @Column
   @AllowNull(true)
+  @Column
   googleAccessToken?: string;
 
-  @Column
   @AllowNull(true)
+  @Column
   googleRefreshToken?: string;
 
-  @HasMany(()=>Article)
+  @HasMany(()=>Article, 'articleWriterId')
   articlesWritten?: Article[]
 
-  @BelongsToMany(() => Article, () => UsersLikeArticles)
+  @BelongsToMany(() => Article, () => UsersLikeArticles, 'userId', 'articleId')
   likeArticles?: Article[];
 
-  @BelongsToMany(() => Article, () => UsersDislikeArticles )
+  @BelongsToMany(() => Article, () => UsersDislikeArticles, 'userId', 'articleId')
   dislikeArticles?: Article[];
 
-  @HasMany(() => Channel)
+  @BelongsToMany(() => Channel, () => UsersFollowChannels, 'userId', 'channelId')
   folloingChannels?: Channel[];
 
   @BelongsToMany(() => User, () => FollowingUser, 'followeeId', 'followerId')
@@ -65,30 +79,4 @@ export class User extends Model<User> {
   @UpdatedAt
   @Column
   updatedAt!: Date;
-}
-
-@Table
-export class FollowingUser extends Model<FollowingUser> {
-  @ForeignKey(() => User)
-  @PrimaryKey
-  @Column
-  followerId!: number;
-
-  @ForeignKey(() => User)
-  @PrimaryKey
-  @Column
-  followeeId!: number;
-}
-
-@Table
-export class BlockingUser extends Model<BlockingUser> {
-  @ForeignKey(() => User)
-  @PrimaryKey
-  @Column
-  blockerId!: number;
-
-  @ForeignKey(() => User)
-  @PrimaryKey
-  @Column
-  blockeeId!: number; 
 }

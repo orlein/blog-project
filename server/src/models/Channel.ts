@@ -1,27 +1,29 @@
-import { Table, Model, PrimaryKey, Column, AutoIncrement, Unique, AllowNull, HasMany } from "sequelize-typescript";
-import { Article, User } from ".";
+import { Table, Model, PrimaryKey, Column, AutoIncrement, Unique, AllowNull, HasMany, BelongsToMany } from "sequelize-typescript";
+import { Article } from "./Article";
+import { User } from "./User";
+import { UsersFollowChannels } from "./UsersFollowChannels";
 
 
 @Table
 export class Channel extends Model<Channel> {
   @PrimaryKey
-  @Column
   @AutoIncrement
   @Unique
+  @Column
   id!: number;
 
-  @Column
   @AllowNull(false)
+  @Column
   title!: string;
 
-  @HasMany(() => Article)
+  @HasMany(() => Article, 'articleChannelId')
   articles!: Article[];
 
-  @Column
   @AllowNull(true)
+  @Column
   description?: string;
 
-  @HasMany(() => User)
+  @BelongsToMany(() => User, () => UsersFollowChannels, 'userId', 'channelId')
   followers!: User[];
 
 }

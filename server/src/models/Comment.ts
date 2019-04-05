@@ -1,32 +1,36 @@
 import { Table, Model, PrimaryKey, Column, AutoIncrement, Unique, AllowNull, BelongsToMany, ForeignKey, BelongsTo, CreatedAt, UpdatedAt } from 'sequelize-typescript';
-import { User, Article, UsersLikeComments, UsersDislikeComments } from '.';
+import { User } from './User';
+import { Article } from './Article';
+import { UsersLikeComments } from './UsersLikeComments';
+import { UsersDislikeComments } from './UsersDislikeComments';
+import { CommentReply } from './CommentReply';
 
 
 @Table
 export class Comment extends Model<Comment> {
   @PrimaryKey
-  @Column
   @AutoIncrement
   @Unique
+  @Column
   id!: number;
 
-  @Column
   @AllowNull(false)
+  @Column
   content!: string;
   
-  @Column
   @AllowNull(true)
+  @Column
   imageUrl?: string;
   
   @ForeignKey(() => User)
   @Column
   commentWriterId!: number;
 
-  @BelongsToMany(() => User, () => UsersLikeComments)
-  likes?: Article[];
+  @BelongsToMany(() => User, () => UsersLikeComments, 'userId', 'commentId')
+  likedUsers?: User[];
 
-  @BelongsToMany(() => User, () => UsersDislikeComments )
-  dislikes?: Article[];
+  @BelongsToMany(() => User, () => UsersDislikeComments, 'userId', 'commentId')
+  dislikedUsers?: User[];
 
   @BelongsToMany(()=>Comment, ()=>CommentReply, 'commentId', 'replyId')
   replies?: Comment[];
@@ -45,17 +49,4 @@ export class Comment extends Model<Comment> {
   @UpdatedAt
   @Column
   updatedAt!: Date;
-}
-
-@Table
-export class CommentReply extends Model<CommentReply> {
-  @ForeignKey(()=>Comment)
-  @PrimaryKey
-  @Column
-  commentId!: number;
-
-  @ForeignKey(()=>Comment)
-  @PrimaryKey
-  @Column
-  replyId!: number;
 }
