@@ -12,4 +12,7 @@ export class UsersLikeComments extends Model<UsersLikeComments> {
   @PrimaryKey
   @Column
   commentId!: number;
+
+  @Column
+  likeOrDislike!: number; 
 }

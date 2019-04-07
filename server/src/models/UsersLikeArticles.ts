@@ -13,4 +13,7 @@ export class UsersLikeArticles extends Model<UsersLikeArticles> {
   @PrimaryKey
   @Column
   articleId!: number;
+
+  @Column
+  likeOrDislike!: number; 
 }
