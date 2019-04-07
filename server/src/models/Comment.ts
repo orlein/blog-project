@@ -1,8 +1,7 @@
-import { Table, Model, PrimaryKey, Column, AutoIncrement, Unique, AllowNull, BelongsToMany, ForeignKey, BelongsTo, CreatedAt, UpdatedAt } from 'sequelize-typescript';
+import { Table, Model, PrimaryKey, Column, AutoIncrement, Unique, AllowNull, BelongsToMany, ForeignKey, BelongsTo, CreatedAt, UpdatedAt, Default } from 'sequelize-typescript';
 import { User } from './User';
 import { Article } from './Article';
 import { UsersLikeComments } from './UsersLikeComments';
-import { UsersDislikeComments } from './UsersDislikeComments';
 import { CommentReply } from './CommentReply';
 
 
@@ -21,16 +20,23 @@ export class Comment extends Model<Comment> {
   @AllowNull(true)
   @Column
   imageUrl?: string;
+
+  @Default(true)
+  @Column
+  isVisible?: boolean;
   
   @ForeignKey(() => User)
   @Column
   commentWriterId!: number;
 
+  @Column
+  toBeDeleted?: boolean;
+
+  @Column
+  toBeDeletedBy?: Date;
+
   @BelongsToMany(() => User, () => UsersLikeComments, 'userId', 'commentId')
   likedUsers?: User[];
-
-  @BelongsToMany(() => User, () => UsersDislikeComments, 'userId', 'commentId')
-  dislikedUsers?: User[];
 
   @BelongsToMany(()=>Comment, ()=>CommentReply, 'commentId', 'replyId')
   replies?: Comment[];

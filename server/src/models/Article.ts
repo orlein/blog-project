@@ -3,7 +3,7 @@ import { User } from './User';
 import { Channel } from './Channel';
 import { Comment } from './Comment';
 import { UsersLikeArticles } from './UsersLikeArticles';
-import { UsersDislikeArticles } from './UsersDislikeArticles';
+
 @Table
 export class Article extends Model<Article> {
 
@@ -21,7 +21,13 @@ export class Article extends Model<Article> {
 
   @Default(true)
   @Column
-  isCommentVisible!: boolean;
+  isVisible!: boolean;
+
+  @Column
+  toBeDeleted?: boolean;
+
+  @Column
+  toBeDeletedBy?: Date;
 
   @ForeignKey(() => User)
   @Column
@@ -32,9 +38,6 @@ export class Article extends Model<Article> {
 
   @BelongsToMany(() => User, () => UsersLikeArticles, 'userId', 'articleId')
   likedUsers?: User[];
-
-  @BelongsToMany(() => User, () => UsersDislikeArticles, 'userId', 'articleId')
-  dislikedUsers?: User[];
 
   @HasMany(() => Comment)
   comments?: Comment[];
