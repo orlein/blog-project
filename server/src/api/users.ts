@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
+import { Util, CustomError, CANNOT_PARSE_NUMBER, SUCCESSFUL, ResponseBody } from '../common';
+import { FollowingUser } from '../models/FollowingUser';
 
 export abstract class UsersController {
 
@@ -15,8 +17,11 @@ export abstract class UsersController {
    * */ 
   public static getUsers = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
-      const user = await User.findAll();
-      return res.status(200).json(user);
+      const page = Util.safeParse(req.query.page);
+      const perPage = Util.safeParse(req.query.perPage);
+      const users = await User.scope('followerCount').findAll({offset: page * perPage, limit: perPage });
+      const responseBody = new ResponseBody(SUCCESSFUL, users);
+      return res.status(200).json(responseBody);
     } catch(e) {
       next(e);
     }
@@ -28,11 +33,13 @@ export abstract class UsersController {
    *  */  
   public static getSingleUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
-
+      const id = Util.safeParse(req.query.id);
+      const user = await User.scope('followerCount').findOne({where: {id}});
+      const responseBody = new ResponseBody(SUCCESSFUL, user);
+      return res.status(200).send(responseBody);
     } catch (e) {
       next(e);
     }
-    return res.status(200).send('single user');
   }
 
   /**
@@ -40,8 +47,10 @@ export abstract class UsersController {
    */
   public static registerSingleUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
-      const user = await User.create(req.body);
-      return res.status(200).json(user);
+      const user = await User.create<User>(req.body);
+      await user.save();
+      const responseBody = new ResponseBody(SUCCESSFUL, {});
+      return res.status(200).json(responseBody);
     } catch (e) {
       next(e);
     }
@@ -52,21 +61,50 @@ export abstract class UsersController {
    * PATCH /api/v1/users/{id}
    */
   public static updateSingleUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('update single user');
+    try {
+      const id = Util.safeParse(req.params.id);
+      await User.update(req.body, {where: { id }})
+      return res.status(200).json(SUCCESSFUL);
+    } catch(e) {
+      next(e);
+    }
   }
 
   /**
    * GET /api/v1/users/{id}/followers
    */
   public static getAllFollowers = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('get all followers of this user');
+    try {
+      const id = Util.safeParse(req.params.id);
+      
+      const followers = await User.findAll<User>({ 
+        where: { id },
+        include: [{
+          model: FollowingUser, as: 'followers',
+          where: { 'foloweeid': id },
+          required: true
+        }]
+      })
+      const responseBody = new ResponseBody(SUCCESSFUL, followers);
+      return res.status(200).json(responseBody);
+    } catch(e) {
+      next(e);
+    }
   } 
 
   /**
    * POST /api/v1/followers/{id}
    */
   public static addFollower = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('this user follows a user ');
+    try {
+      const followeeId = Util.safeParse(req.user.id);
+      const followerId = Util.safeParse(req.params.id);
+      await FollowingUser.create<FollowingUser>({ followerId, followeeId });
+      const responseBody = new ResponseBody(SUCCESSFUL, {});
+      return res.status(200).json(responseBody);
+    } catch(e) {
+      next(e);
+    }
   }
 
   /**

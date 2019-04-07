@@ -10,7 +10,14 @@ import { UsersFollowChannels } from './UsersFollowChannels';
 import { UsersLikeComments } from './UsersLikeComments';
 import { Role } from './Role';
 @DefaultScope({
-  attributes: ['id', 'nickname', 'email', 'createdAt', 'blockedByAdmin']
+  attributes: {
+    exclude: [
+      "password", 
+      "facebookAccessToken", 
+      "facebookRefreshToken",
+      "googleAccessToken", 
+      "googleRefreshToken",
+    ]}
 })
 @Scopes({
   followerCount: {
@@ -20,7 +27,7 @@ import { Role } from './Role';
       as: "followers"
     }],
     group: 'id'
-  }
+  },
 })
 @Table
 export class User extends Model<User> {
