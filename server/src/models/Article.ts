@@ -22,7 +22,8 @@ export class Article extends Model<Article> {
   @Default(true)
   @Column
   isVisible!: boolean;
-
+  
+  @Default(false)
   @Column
   toBeDeleted?: boolean;
 

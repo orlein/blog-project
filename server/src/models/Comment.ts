@@ -29,6 +29,7 @@ export class Comment extends Model<Comment> {
   @Column
   commentWriterId!: number;
 
+  @Default(false)
   @Column
   toBeDeleted?: boolean;
 
