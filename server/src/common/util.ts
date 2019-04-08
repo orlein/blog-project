@@ -1,4 +1,4 @@
-import { CustomError, CANNOT_PARSE_NUMBER } from "./codes";
+import { CustomError, CANNOT_PARSE_NUMBER, UNKNOWN_ERROR } from "./codes";
 export abstract class Util {
   public static safeParse = (num: any): number=> {
     const n = Number(num);
@@ -8,4 +8,5 @@ export abstract class Util {
       return n;
     }
   }
+
 }

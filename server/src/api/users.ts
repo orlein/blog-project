@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
-import { Util, CustomError, CANNOT_PARSE_NUMBER, SUCCESSFUL, ResponseBody } from '../common';
+import { Util, SUCCESSFUL, ResponseBody } from '../common';
 import { FollowingUser } from '../models/FollowingUser';
+import { BlockingUser } from '../models/BlockingUser';
+
 
 export abstract class UsersController {
 
@@ -63,9 +65,25 @@ export abstract class UsersController {
   public static updateSingleUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
       const id = Util.safeParse(req.params.id);
-      await User.update(req.body, {where: { id }})
-      return res.status(200).json(SUCCESSFUL);
+      const result = await User.update(req.body, {where: { id }})
+      const responseBody = new ResponseBody(SUCCESSFUL, result);
+      return res.status(200).json(responseBody);
     } catch(e) {
+      next(e);
+    }
+  }
+
+
+  /**
+   * DELETE /api/v1/users/{id}
+   */
+  public static deleteSingleUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
+    try {
+      const id = Util.safeParse(req.params.id);
+      const result = await User.update({ toBeDeleted: true }, { where: {id}});
+      const responseBody = new ResponseBody(SUCCESSFUL, result);
+      return res.status(200).json(responseBody);
+    } catch (e) {
       next(e);
     }
   }
@@ -97,8 +115,8 @@ export abstract class UsersController {
    */
   public static addFollower = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
-      const followeeId = Util.safeParse(req.user.id);
-      const followerId = Util.safeParse(req.params.id);
+      const followerId = Util.safeParse(req.user.id);
+      const followeeId = Util.safeParse(req.params.id);
       await FollowingUser.create<FollowingUser>({ followerId, followeeId });
       const responseBody = new ResponseBody(SUCCESSFUL, {});
       return res.status(200).json(responseBody);
@@ -109,55 +127,68 @@ export abstract class UsersController {
 
   /**
    * POST /api/v1/followers
+   * body: {
+   *  followers: [
+   *  ...asdf
+   * ]}
    */
   public static addManyFollowers = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('this user follows many users ');
+    try {
+      const followerId = Util.safeParse(req.user.id);
+      const [ ...followees ]: User[] = req.body.followees;
+
+      const data = followees.map((followee: User) => { return { followerId, followeeId: followee.id }});
+      const result = await FollowingUser.bulkCreate(data, { returning: true })
+      
+      const responseBody = new ResponseBody(SUCCESSFUL, { result });
+      return res.status(200).json(responseBody);
+    } catch(e) {
+      next(e);
+    }
   }
 
   /**
    * DELETE /api/v1/followers/{id}
    */
   public static removeFollower = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('this user unfollows a user ');
-  }
-  
-  /**
-   * POST /api/v1/blockers
-   * DELETE method cannot get body
-   */
-  public static removeManyFollowers = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('this user unfollow many users from body ');
+    try {
+      const followerId = Util.safeParse(req.user.id);
+      const followeeId = Util.safeParse(req.params.id);
+      await FollowingUser.destroy({ where: { followerId, followeeId }})
+      const responseBody = new ResponseBody(SUCCESSFUL, { followerId })
+      return res.status(200).json(responseBody);
+    } catch(e) {
+      next(e);
+    }
   }
 
   /**
    * POST /api/v1/blockers/{id}
    */
   public static addBlockers = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('this user follow a user ');
+    try {
+      const blockerId = Util.safeParse(req.user.id);
+      const blockeeId = Util.safeParse(req.params.id);
+      const newBlockee = await BlockingUser.create<BlockingUser>({ blockerId, blockeeId });
+      const responseBody = new ResponseBody(SUCCESSFUL, { blocker: newBlockee });
+      return res.status(200).json(responseBody);
+    } catch(e) {
+      next(e);
+    }
   }
 
   /**
    * DELETE /api/v1/blockers/{id}
    */
   public static removeBlocker = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('this user unfollow a user ');
+    try {
+      const blockerId = Util.safeParse(req.user.id);
+      const blockeeId = Util.safeParse(req.params.id);
+      const oldBlockee = await BlockingUser.destroy({ where: { blockerId, blockeeId }})
+      const responseBody = new ResponseBody(SUCCESSFUL, { oldBlockee })
+      return res.status(200).json(responseBody);
+    } catch(e) {
+      next(e);
+    }
   }
-
-  /**
-   * POST /api/v1/blockers
-   * DELETE method cannot get body
-   */
-  public static removeManyBlocker = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('this user unfollow many users from body ');
-  }
-
-  /**
-   * DELETE /api/v1/users/{id}
-   */
-  public static deleteSingleUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('delete single user');
-  }
-
-  
-  
 }

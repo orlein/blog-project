@@ -17,7 +17,9 @@ import { Role } from './Role';
       "facebookRefreshToken",
       "googleAccessToken", 
       "googleRefreshToken",
-    ]}
+  ]}, where: {
+    toBeDeleted: false
+  }
 })
 @Scopes({
   followerCount: {
@@ -91,6 +93,7 @@ export class User extends Model<User> {
   @Column
   googleRefreshToken?: string;
 
+  @Default(false)
   @Column
   toBeDeleted?: boolean;
 
