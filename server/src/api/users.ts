@@ -51,7 +51,7 @@ export abstract class UsersController {
     try {
       const user = await User.create<User>(req.body);
       await user.save();
-      const responseBody = new ResponseBody(SUCCESSFUL, {});
+      const responseBody = new ResponseBody(SUCCESSFUL, user);
       return res.status(200).json(responseBody);
     } catch (e) {
       next(e);
