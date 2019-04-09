@@ -8,5 +8,7 @@ export abstract class Util {
       return n;
     }
   }
-
+  public static safeParseMany = (nums: any[]): number[] => {
+    return nums.map((num: number) => Util.safeParse(num));
+  }
 }
