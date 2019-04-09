@@ -1,4 +1,4 @@
-import { Table, Model, ForeignKey, PrimaryKey, Column } from "sequelize-typescript";
+import { Table, Model, ForeignKey, PrimaryKey, Column, Max, Min } from "sequelize-typescript";
 import { User } from "./User";
 import { Article } from "./Article";
 
@@ -14,6 +14,8 @@ export class UsersLikeArticles extends Model<UsersLikeArticles> {
   @Column
   articleId!: number;
 
+  @Max(1)
+  @Min(-1)
   @Column
   likeOrDislike!: number; 
 }
