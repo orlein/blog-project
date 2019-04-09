@@ -1,9 +1,14 @@
-import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, ForeignKey, Unique, AutoIncrement, BelongsToMany, Default } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, ForeignKey, Unique, AutoIncrement, BelongsToMany, Default, DefaultScope } from 'sequelize-typescript';
 import { User } from './User';
 import { Channel } from './Channel';
 import { Comment } from './Comment';
 import { UsersLikeArticles } from './UsersLikeArticles';
 
+@DefaultScope({
+  where: {
+    toBeDeleted: false
+  }
+})
 @Table
 export class Article extends Model<Article> {
 
