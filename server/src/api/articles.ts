@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Util, ResponseBody, SUCCESSFUL } from '../common';
 import { Article } from '../models/Article';
 import { UsersLikeArticles } from '../models/UsersLikeArticles';
+import { LikeService } from '../services/LikeService';
 
 export abstract class ArticlesController {
 
@@ -97,26 +98,9 @@ export abstract class ArticlesController {
     try {
       const likerId = Util.safeParse(req.user.id);
       const articleId = Util.safeParse(req.params.id);
-      const userLikeArticle = await UsersLikeArticles.findOne({ where: { userId: likerId, articleId: articleId }})
-      const responseBody = new ResponseBody(SUCCESSFUL, {});
-      if(userLikeArticle) {
-        const result = await UsersLikeArticles.update(
-          { likeOrDislike: 1 }, 
-          { where: { 
-            userId: likerId, 
-            articleId: articleId }
-          })
-        responseBody.body = result;
-        return res.status(200).json(responseBody);
-      } else {
-        const result = await UsersLikeArticles.create<UsersLikeArticles>({
-          userId: likerId,
-          articleId: articleId,
-          likeOrDislike: 1
-        })
-        responseBody.body = result;
-        return res.status(200).json(responseBody);
-      }
+      const result = await LikeService.likeDislikeCancel(likerId, articleId)(1);
+      const responseBody = new ResponseBody(SUCCESSFUL, result);
+      return res.status(200).json(responseBody);
     } catch(e) {
       next(e);
     }
@@ -129,29 +113,26 @@ export abstract class ArticlesController {
     try {
       const likerId = Util.safeParse(req.user.id);
       const articleId = Util.safeParse(req.params.id);
-      const userLikeArticle = await UsersLikeArticles.findOne({ where: { userId: likerId, articleId: articleId }})
-      const responseBody = new ResponseBody(SUCCESSFUL, {});
-      if(userLikeArticle) {
-        const result = await UsersLikeArticles.update(
-          { likeOrDislike: 1 }, 
-          { where: { 
-            userId: likerId, 
-            articleId: articleId }
-          })
-        responseBody.body = result;
-        return res.status(200).json(responseBody);
-      } else {
-        const result = await UsersLikeArticles.create<UsersLikeArticles>({
-          userId: likerId,
-          articleId: articleId,
-          likeOrDislike: -1
-        })
-        responseBody.body = result;
-        return res.status(200).json(responseBody);
-      }
+      const result = await LikeService.likeDislikeCancel(likerId, articleId)(-1);
+      const responseBody = new ResponseBody(SUCCESSFUL, result);
+      return res.status(200).json(responseBody);
     } catch(e) {
       next(e);
     }
   }
 
+  /**
+   * POST /api/v1/articlese/{id}/cancel
+   */
+  public static cancelLikeDislikeArticle = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
+    try {
+      const likerId = Util.safeParse(req.user.id);
+      const articleId = Util.safeParse(req.params.id);
+      const result = await LikeService.likeDislikeCancel(likerId, articleId)(0);
+      const responseBody = new ResponseBody(SUCCESSFUL, result);
+      return res.status(200).json(responseBody);
+    } catch(e) {
+      next(e);
+    } 
+  }
 }
