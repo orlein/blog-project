@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Util, ResponseBody, SUCCESSFUL } from '../common';
 import { Channel } from '../models/Channel';
+import { UsersFollowChannels } from '../models/UsersFollowChannels';
 
 export abstract class ChannelsController {
   /**
@@ -70,6 +71,33 @@ export abstract class ChannelsController {
       const responseBody = new ResponseBody(SUCCESSFUL, result);
       return res.status(200).json(responseBody);
     } catch(e) {
+      next(e);
+    }
+  }
+
+  /**
+   * POST /api/v1/channel/{id}/users
+   */
+  public static followChannel = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
+    try {
+      const followerId = Util.safeParse(req.user.id);
+      const channelId = Util.safeParse(req.params.id);
+      await UsersFollowChannels.create<UsersFollowChannels>({ channelId, userId: followerId });
+      const responseBody = new ResponseBody(SUCCESSFUL, {});
+      return res.status(200).json(responseBody);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public static unfollowChannel  = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
+    try {
+      const followerId = Util.safeParse(req.user.id);
+      const channelId = Util.safeParse(req.params.id);
+      await UsersFollowChannels.destroy({where: { channelId, userId: followerId }});
+      const responseBody = new ResponseBody(SUCCESSFUL, {});
+      return res.status(200).json(responseBody);
+    } catch (e) {
       next(e);
     }
   }
