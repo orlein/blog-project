@@ -1,9 +1,13 @@
-import { Table, Model, PrimaryKey, Column, AutoIncrement, Unique, AllowNull, HasMany, BelongsToMany, Max, Min } from 'sequelize-typescript';
+import { Table, Model, PrimaryKey, Column, AutoIncrement, Unique, AllowNull, HasMany, BelongsToMany, Max, Min, Default, DefaultScope } from 'sequelize-typescript';
 import { Article } from "./Article";
 import { User } from "./User";
 import { UsersFollowChannels } from "./UsersFollowChannels";
 
-
+@DefaultScope({
+  where: {
+    toBeDeleted: false
+  }
+})
 @Table
 export class Channel extends Model<Channel> {
   @PrimaryKey
@@ -25,6 +29,13 @@ export class Channel extends Model<Channel> {
   @Max(50)
   @Column
   readRestriction!: number
+
+  @Default(false)
+  @Column
+  toBeDeleted?: boolean;
+
+  @Column
+  toBeDeletedBy?: Date;
 
   @HasMany(() => Article, 'articleChannelId')
   articles!: Article[];
