@@ -98,7 +98,7 @@ export abstract class ArticlesController {
     try {
       const likerId = Util.safeParse(req.user.id);
       const articleId = Util.safeParse(req.params.id);
-      const result = await LikeService.likeDislikeCancel(likerId, articleId)(1);
+      const result = await LikeService.cancelArticleLikeDislike(likerId, articleId)(1);
       const responseBody = new ResponseBody(SUCCESSFUL, result);
       return res.status(200).json(responseBody);
     } catch(e) {
@@ -113,7 +113,7 @@ export abstract class ArticlesController {
     try {
       const likerId = Util.safeParse(req.user.id);
       const articleId = Util.safeParse(req.params.id);
-      const result = await LikeService.likeDislikeCancel(likerId, articleId)(-1);
+      const result = await LikeService.cancelArticleLikeDislike(likerId, articleId)(-1);
       const responseBody = new ResponseBody(SUCCESSFUL, result);
       return res.status(200).json(responseBody);
     } catch(e) {
@@ -122,13 +122,13 @@ export abstract class ArticlesController {
   }
 
   /**
-   * POST /api/v1/articlese/{id}/cancel
+   * POST /api/v1/articles/{id}/cancel
    */
   public static cancelLikeDislikeArticle = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
       const likerId = Util.safeParse(req.user.id);
       const articleId = Util.safeParse(req.params.id);
-      const result = await LikeService.likeDislikeCancel(likerId, articleId)(0);
+      const result = await LikeService.cancelArticleLikeDislike(likerId, articleId)(0);
       const responseBody = new ResponseBody(SUCCESSFUL, result);
       return res.status(200).json(responseBody);
     } catch(e) {
