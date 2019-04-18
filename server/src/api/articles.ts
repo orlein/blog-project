@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Util, ResponseBody, SUCCESSFUL } from '../common';
 import { Article } from '../models/Article';
-import { UsersLikeArticles } from '../models/UsersLikeArticles';
-import { LikeService } from '../services/LikeService';
+import { LikeService } from '../services';
 
 export abstract class ArticlesController {
 
