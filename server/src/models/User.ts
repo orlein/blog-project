@@ -79,6 +79,14 @@ export class User extends Model<User> {
 
   @AllowNull(true)
   @Column
+  localAccessToken?: string;
+
+  @AllowNull(true)
+  @Column
+  localRefreshToken?: string;
+
+  @AllowNull(true)
+  @Column
   facebookAccessToken?: string;
 
   @AllowNull(true)

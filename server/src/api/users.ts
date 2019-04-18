@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
-import { Util, SUCCESSFUL, ResponseBody } from '../common';
+import { Util, SUCCESSFUL, ResponseBody, CustomError, USER_NOT_EXISTS } from '../common';
 import { FollowingUser } from '../models/FollowingUser';
 import { BlockingUser } from '../models/BlockingUser';
+import { USER_ALREADY_EXISTS } from '../common';
+import passport from 'passport';
 
 
 export abstract class UsersController {
@@ -11,8 +13,40 @@ export abstract class UsersController {
    * POST /api/v1/login 
    */
   public static login = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
-    return res.status(200).send('login');
+    try {
+      await passport.authenticate('local', {session: false}, (err: any, user: User, info: any) => {
+        if(err) { return next(err) }
+        if(user) {
+          user.localAccessToken = user.generateJWT();
+          const responseBody = new ResponseBody(SUCCESSFUL, user.toAuthJson());
+          return res.status(200).json(responseBody);
+        } else {
+          throw new CustomError(USER_NOT_EXISTS);
+        }
+      })(req, res, next);
+      return res.sendStatus(500);
+    }catch(e) {
+      next(e);
+    }
   }
+
+  /**
+   * POST /api/v1/users
+   */
+  public static join = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
+    try {
+      const isAlready = await User.findOne({ where: { email: req.user.email }});
+      if (isAlready) {
+        throw new CustomError(USER_ALREADY_EXISTS);
+      }
+      const user = await User.create<User>(req.body);
+      await user.save();
+      const responseBody = new ResponseBody(SUCCESSFUL, user);
+      return res.status(200).json(responseBody);
+    } catch(e) {
+      next(e);
+    }
+  } 
 
   /** 
    * GET /api/v1/users?page={page}&perPage={perPage}
