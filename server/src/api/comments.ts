@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Util, ResponseBody, SUCCESSFUL } from '../common';
 import { Comment } from '../models/Comment';
+import { Article } from '../models/Article';
 export abstract class CommentsController {
 
   /**
@@ -24,10 +25,11 @@ export abstract class CommentsController {
    */
   public static postCommentToAnArticle = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
-      
-      const user = await User.create<User>(req.body);
-      await user.save();
-      const responseBody = new ResponseBody(SUCCESSFUL, user);
+      const articleId = Util.safeParse(req.params.id);
+      const commentBody = {...req.body, articleId: articleId}
+      const comment = await Comment.create<Comment>(commentBody);
+      await comment.save();
+      const responseBody = new ResponseBody(SUCCESSFUL, comment);
       return res.status(200).json(responseBody);
     } catch (e) {
       next(e);
@@ -40,7 +42,7 @@ export abstract class CommentsController {
   public static editComment = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
       const id = Util.safeParse(req.params.id);
-      const result = await User.update(req.body, {where: { id }})
+      const result = await Comment.update(req.body, {where: { id }})
       const responseBody = new ResponseBody(SUCCESSFUL, result);
       return res.status(200).json(responseBody);
     } catch(e) {
@@ -54,7 +56,7 @@ export abstract class CommentsController {
   public static deleteComment = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
       const id = Util.safeParse(req.params.id);
-      const result = await User.update({ toBeDeleted: true }, { where: {id}});
+      const result = await Comment.update({ toBeDeleted: true }, { where: {id}});
       const responseBody = new ResponseBody(SUCCESSFUL, result);
       return res.status(200).json(responseBody);
     } catch (e) {
