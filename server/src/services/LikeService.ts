@@ -4,8 +4,9 @@ export abstract class LikeService {
   public static cancelArticleLikeDislike = (userId: number, articleId: number) => async (ldc: number): Promise<any> => {
     const userLikeArticle = await UsersLikeArticles.findOne({ where: { userId: userId, articleId: articleId }})
     if(userLikeArticle) {
+      const likeOrDislike = userLikeArticle.likeOrDislike === ldc ? 0 : ldc;
       const result = await UsersLikeArticles.update(
-        { likeOrDislike: -1 }, 
+        { likeOrDislike }, 
         { where: { 
           userId: userId, 
           articleId: articleId }
@@ -13,9 +14,9 @@ export abstract class LikeService {
       return result;
     } else {
       const result = await UsersLikeArticles.create<UsersLikeArticles>({
-        userId: userId,
-        articleId: articleId,
-        likeOrDislike: -1
+        userId,
+        articleId,
+        likeOrDislike: ldc
       })
       return result;
     }
@@ -24,8 +25,9 @@ export abstract class LikeService {
   public static cancelCommentLikeDislike = (userId: number, commentId: number) => async (ldc: number): Promise<any> => {
     const userLikeComment = await UsersLikeComments.findOne({ where: { userId: userId, commentId: commentId }})
     if(userLikeComment) {
+      const likeOrDislike = userLikeComment.likeOrDislike === ldc ? 0 : ldc;
       const result = await UsersLikeArticles.update(
-        { likeOrDislike: -1 }, 
+        { likeOrDislike }, 
         { where: { 
           userId: userId, 
           commentId: commentId }
@@ -35,8 +37,9 @@ export abstract class LikeService {
       const result = await UsersLikeArticles.create<UsersLikeArticles>({
         userId: userId,
         commentId: commentId,
-        likeOrDislike: -1
+        likeOrDislike: ldc
       })
       return result;
     }
+  }
 }
