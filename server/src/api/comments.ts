@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Util, ResponseBody, SUCCESSFUL } from '../common';
 import { Comment } from '../models/Comment';
 import { Article } from '../models/Article';
+import { LikeService } from '../services';
 export abstract class CommentsController {
 
   /**
@@ -70,8 +71,8 @@ export abstract class CommentsController {
   public static likeComment = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
       const likerId = Util.safeParse(req.user.id);
-      const articleId = Util.safeParse(req.params.id);
-      const result = await LikeService.cancelArticleLikeDislike(likerId, articleId)(1);
+      const commentId = Util.safeParse(req.params.id);
+      const result = await LikeService.cancelCommentLikeDislike(likerId, commentId)(1);
       const responseBody = new ResponseBody(SUCCESSFUL, result);
       return res.status(200).json(responseBody);
     } catch(e) {
@@ -85,8 +86,8 @@ export abstract class CommentsController {
   public static dislikeComment = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
       const likerId = Util.safeParse(req.user.id);
-      const articleId = Util.safeParse(req.params.id);
-      const result = await LikeService.cancelArticleLikeDislike(likerId, articleId)(-1);
+      const commentId = Util.safeParse(req.params.id);
+      const result = await LikeService.cancelCommentLikeDislike(likerId, commentId)(-1);
       const responseBody = new ResponseBody(SUCCESSFUL, result);
       return res.status(200).json(responseBody);
     } catch(e) {
