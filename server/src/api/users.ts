@@ -17,7 +17,7 @@ export abstract class UsersController {
       await passport.authenticate('local', {session: false}, (err: any, user: User, info: any) => {
         if(err) { return next(err) }
         if(user) {
-          user.localAccessToken = user.generateJWT();
+          user.localToken = user.generateJWT();
           const responseBody = new ResponseBody(SUCCESSFUL, user.toAuthJson());
           return res.status(200).json(responseBody);
         } else {

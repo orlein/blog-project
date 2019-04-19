@@ -1,7 +1,9 @@
+
+import sequelize from 'sequelize';
 import { Table, Column, Model, HasMany, PrimaryKey, CreatedAt, UpdatedAt, Scopes, AllowNull, BelongsTo, AutoIncrement, Unique, ForeignKey, BelongsToMany, DefaultScope, Default, IsUrl, Max, Min } from 'sequelize-typescript';
+import jwt from 'jsonwebtoken';
 import { Article } from './Article';
 import { Channel } from './Channel';
-import sequelize from 'sequelize';
 import { UsersLikeArticles } from './UsersLikeArticles';
 import { Comment } from './Comment';
 import { FollowingUser } from './FollowingUser';
@@ -9,6 +11,8 @@ import { BlockingUser } from './BlockingUser';
 import { UsersFollowChannels } from './UsersFollowChannels';
 import { UsersLikeComments } from './UsersLikeComments';
 import { Role } from './Role';
+import { jwtSecret } from '../config';
+
 @DefaultScope({
   attributes: {
     exclude: [
@@ -79,11 +83,27 @@ export class User extends Model<User> {
 
   @AllowNull(true)
   @Column
-  localAccessToken?: string;
+  localToken?: string;
 
-  @AllowNull(true)
-  @Column
-  localRefreshToken?: string;
+  generateJWT() {
+    const today = new Date();
+    const expireDate = new Date(today);
+    expireDate.setDate(today.getDate() + 60);
+    return jwt.sign({
+      id: this.id,
+      email: this.email,
+      exp: expireDate.getTime() / 1000,
+      nickname: this.nickname
+    }, jwtSecret)
+  }  
+
+  toAuthJson() {
+    return {
+      email: this.email,
+      token: this.generateJWT(),
+      activated: false
+    }
+  }
 
   @AllowNull(true)
   @Column
@@ -118,7 +138,7 @@ export class User extends Model<User> {
   likeComments?: Article[];
 
   @BelongsToMany(() => Channel, () => UsersFollowChannels, 'userId', 'channelId')
-  folloingChannels?: Channel[];
+  followingChannels?: Channel[];
 
   @BelongsToMany(() => User, () => FollowingUser, 'followeeId', 'followerId')
   followers?: User[];
