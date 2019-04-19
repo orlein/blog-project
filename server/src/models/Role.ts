@@ -1,4 +1,4 @@
-import { Model, Table, PrimaryKey, AutoIncrement, Unique, Column, CreatedAt, UpdatedAt, Min, Max, BelongsToMany, HasMany } from 'sequelize-typescript';
+import { Model, Table, PrimaryKey, AutoIncrement, Unique, Column, CreatedAt, UpdatedAt, Min, Max, BelongsToMany, HasMany, Default } from 'sequelize-typescript';
 import { User } from './User';
 
 @Table
@@ -15,6 +15,13 @@ export class Role extends Model<Role> {
 
   @HasMany(() => User, 'userId')
   usersHasRole?: User[];
+
+  @Default(false)
+  @Column
+  toBeDeleted?: boolean;
+
+  @Column
+  toBeDeletedBy?: Date;
 
   @CreatedAt
   @Column
