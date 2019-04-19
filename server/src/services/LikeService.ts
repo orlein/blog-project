@@ -1,12 +1,11 @@
 import { UsersLikeArticles } from '../models/UsersLikeArticles';
 import { UsersLikeComments } from '../models/UsersLikeComments';
 export abstract class LikeService {
-  public static cancelArticleLikeDislike = (userId: number, articleId: number) => async (ldc: number): Promise<any> => {
+  public static likeDislikeCancelArticle = (userId: number, articleId: number) => async (ldc: number): Promise<any> => {
     const userLikeArticle = await UsersLikeArticles.findOne({ where: { userId: userId, articleId: articleId }})
     if(userLikeArticle) {
-      const likeOrDislike = userLikeArticle.likeOrDislike === ldc ? 0 : ldc;
       const result = await UsersLikeArticles.update(
-        { likeOrDislike }, 
+        { likeOrDislike: ldc }, 
         { where: { 
           userId: userId, 
           articleId: articleId }
@@ -22,12 +21,11 @@ export abstract class LikeService {
     }
   }
 
-  public static cancelCommentLikeDislike = (userId: number, commentId: number) => async (ldc: number): Promise<any> => {
+  public static likeDislikeCancelComment = (userId: number, commentId: number) => async (ldc: number): Promise<any> => {
     const userLikeComment = await UsersLikeComments.findOne({ where: { userId: userId, commentId: commentId }})
     if(userLikeComment) {
-      const likeOrDislike = userLikeComment.likeOrDislike === ldc ? 0 : ldc;
       const result = await UsersLikeArticles.update(
-        { likeOrDislike }, 
+        { likeOrDislike: ldc }, 
         { where: { 
           userId: userId, 
           commentId: commentId }
