@@ -1,5 +1,6 @@
 import { Model, Table, PrimaryKey, AutoIncrement, Unique, Column, CreatedAt, UpdatedAt, Min, Max, BelongsToMany, HasMany, Default } from 'sequelize-typescript';
 import { User } from './User';
+import { UserHasRole } from './UserHasRole';
 
 @Table
 export class Role extends Model<Role> {
@@ -11,9 +12,10 @@ export class Role extends Model<Role> {
   id!: number;
 
   @Column
+  @Unique
   roleName!: string;;
 
-  @HasMany(() => User, 'userId')
+  @BelongsToMany(() => User, () => UserHasRole, 'userId', 'roleId')
   usersHasRole?: User[];
 
   @Default(false)

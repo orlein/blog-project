@@ -12,6 +12,7 @@ import { UsersFollowChannels } from './UsersFollowChannels';
 import { UsersLikeComments } from './UsersLikeComments';
 import { Role } from './Role';
 import { jwtSecret } from '../config';
+import { UserHasRole } from './UserHasRole';
 
 @DefaultScope({
   attributes: {
@@ -74,12 +75,12 @@ export class User extends Model<User> {
   @Column
   level!: number;
 
-  @ForeignKey(() => Role)
-  @Column
-  roleId!: number;
+  @BelongsToMany(() => Role, () => UserHasRole, 'userId', 'roleId')
+  roles!: Role[];
 
-  @BelongsTo(() => Role, 'roleId')
-  role!: Role;
+  authorize(requiredRoles: string[]) {
+
+  }
 
   @AllowNull(true)
   @Column
