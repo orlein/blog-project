@@ -78,8 +78,17 @@ export class User extends Model<User> {
   @BelongsToMany(() => Role, () => UserHasRole, 'userId', 'roleId')
   roles!: Role[];
 
-  authorize(requiredRoles: string[]) {
-
+  authorize(requiredRoles: string[]): boolean {
+    let result = false;
+    Role.findAll({
+      include: [{
+        model: User,
+        where: { id: this.id }
+       }]
+    }).then((roles) => {
+      result = roles.filter((role) => requiredRoles.includes(role.roleName)).length > 0;
+    })
+    return result;
   }
 
   @AllowNull(true)
