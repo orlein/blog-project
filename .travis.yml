@@ -8,24 +8,24 @@ script:
   - echo skip this script
 #   - docker run junfinent/react-test npm run test -- --coverage
 
-after_success:
-  - docker build -t pcj9024/blog-client ./client
-  - docker build -t pcj9024/blog-server ./server
-  - docker build -t pcj9024/blog-nginx ./nginx
-  - echo "$DOCKER_PW" | docker login -u "$DOCKER_ID" --password-stdin
-  - docker push pcj9024/blog-client
-  - docker push pcj9024/blog-nginx
-  - docker push pcj9024/blog-server
+# after_success:
+#   - docker build -t pcj9024/blog-client ./client
+#   - docker build -t pcj9024/blog-server ./server
+#   - docker build -t pcj9024/blog-nginx ./nginx
+#   - echo "$DOCKER_PW" | docker login -u "$DOCKER_ID" --password-stdin
+#   - docker push pcj9024/blog-client
+#   - docker push pcj9024/blog-nginx
+#   - docker push pcj9024/blog-server
 
-deploy:
-  provider: elasticbeanstalk
-  region: ap-northeast-2
-  app: blog-project
-  env: BlogProject-env
-  bucket_name: elasticbeanstalk-ap-northeast-2-515295794035
-  bucket_path: blog-project
-  on:
-    branch: master
-  access_key_id: $AWS_EBS_ACCESS_KEY  
-  secret_access_key:
-    secure: $AWS_EBS_SECRET_KEY
+# deploy:
+#   provider: elasticbeanstalk
+#   region: ap-northeast-2
+#   app: blog-project
+#   env: BlogProject-env
+#   bucket_name: elasticbeanstalk-ap-northeast-2-515295794035
+#   bucket_path: blog-project
+#   on:
+#     branch: master
+#   access_key_id: $AWS_EBS_ACCESS_KEY  
+#   secret_access_key:
+#     secure: $AWS_EBS_SECRET_KEY
