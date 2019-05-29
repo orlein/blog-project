@@ -11,8 +11,8 @@ export class Role extends Model<Role> {
   @Column
   id!: number;
 
-  @Column
   @Unique
+  @Column
   roleName!: string;;
 
   @BelongsToMany(() => User, () => UserHasRole, 'userId', 'roleId')

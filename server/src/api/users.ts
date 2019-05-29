@@ -53,9 +53,10 @@ export abstract class UsersController {
    * */ 
   public static getUsers = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> =>{
     try {
-      const page = Util.safeParse(req.query.page);
-      const perPage = Util.safeParse(req.query.perPage);
-      const users = await User.scope('followerCount').findAll({offset: page * perPage, limit: perPage });
+      // const page = Util.safeParse(req.query.page);
+      // const perPage = Util.safeParse(req.query.perPage);
+      // const users = await User.scope('followerCount').findAll({offset: page * perPage, limit: perPage });
+      const users = await User.findAll();
       const responseBody = new ResponseBody(SUCCESSFUL, users);
       return res.status(200).json(responseBody);
     } catch(e) {
